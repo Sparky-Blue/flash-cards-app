@@ -10,7 +10,9 @@ import {
   TOGGLE_ADD_CARD,
   TOGGLE_EDIT_CARD,
   TOGGLE_STUDY,
-  TOGGLE_CARD_VIEW
+  TOGGLE_CARD_VIEW,
+  SET_CURRENT_CARD,
+  SET_CURRENT_DECK
 } from "./actions";
 
 const initialState = {
@@ -20,10 +22,11 @@ const initialState = {
   showAddCard: false,
   showStudy: false,
   showBack: false,
-
+  currentDeck: null,
+  currentCard: null,
   decks: [
     {
-      name: countriesSet1,
+      name: "countriesSet1",
       data: [
         {
           Front: "United Kingdom",
@@ -46,114 +49,142 @@ const initialState = {
   ]
 };
 
-function decks(state = initialState, action) {
+function decks(
+  state = [
+    {
+      name: "countriesSet1",
+      data: [
+        {
+          Front: "United Kingdom",
+          Back: "London"
+        },
+        {
+          Front: "Nauru",
+          Back: "Yaren"
+        },
+        {
+          Front: "Afghanistan",
+          Back: "Kabul"
+        },
+        {
+          Front: "Albania",
+          Back: "Tirana"
+        }
+      ]
+    }
+  ],
+  action
+) {
   switch (action.type) {
     case ADD_DECK:
-      return Object.assign({}, state, {
-        decks: {
-          ...state.decks,
-          [action.name]: []
+      return [
+        ...state,
+        {
+          name: action.name,
+          data: []
         }
-      });
+      ];
     case DELETE_DECK:
-      const newDecks = state.decks.filter(deck => deck.name !== action.name);
-      return Object.assign({}, state, {
-        decks: newDecks
-      });
+      return state.filter(deck => deck.name !== action.name);
     case ADD_CARD:
-      const newDecks = state.decks.map(deck => {
+      return state.map(deck => {
         if (deck.name === action.deckName) {
-          deck.data.push(card);
+          return Object.assign({}, deck, {
+            data: [...deck.data, { ...action.card }]
+          });
         }
         return deck;
-      });
-      return Object.assign({}, state, {
-        decks: newDecks
       });
     case UPDATE_CARD:
-      const newDecks = state.decks.map(deck => {
-        if (deck.name === action.deckName) {
-          deck.data[action.index] = action.card;
-        }
-        return deck;
-      });
-      return Object.assign({}, state, {
-        decks: newDecks
-      });
+      return [
+        state.map(deck => {
+          if (deck.name === action.deckName) {
+            return deck.data.map((card, i) => {
+              if (i === action.index) return action.card;
+              return card;
+            });
+          }
+          return deck;
+        })
+      ];
     case DELETE_CARD:
-      const newDecks = state.decks.map(deck => {
-        if (deck.name === action.deckName) {
-          deck.data.filter((card, i) => i !== action.index);
-        }
-        return deck;
-      });
-      return Object.assign({}, state, {
-        decks: newDecks
-      });
+      return [
+        state.map(deck => {
+          if (deck.name === action.deckName) {
+            return Object.assign({}, deck, {
+              data: deck.data.filter((card, i) => i !== action.index)
+            });
+          }
+          return deck;
+        })
+      ];
     default:
       return state;
   }
 }
 
-function showAddDeck(state = initialState) {
+function showAddDeck(state = false, action) {
   switch (action.type) {
     case TOGGLE_ADD_DECK:
-      return Object.assign({}, state, {
-        showAddDeck: !state.showAddDeck
-      });
+      return !state.showAddDeck;
+
     default:
       return state;
   }
 }
 
-function showEditDeck(state = initialState) {
-  switch (action.type) {
-    case TOGGLE_EDIT_DECK:
-      return Object.assign({}, state, {
-        showEditDeck: !state.showEditDeck
-      });
-    default:
-      return state;
-  }
-}
-function showEditCard(state = initialState) {
+function showEditCard(state = false, action) {
   switch (action.type) {
     case TOGGLE_EDIT_CARD:
-      return Object.assign({}, state, {
-        showEditCard: !state.showEditCard
-      });
+      return !state.showEditCard;
+
     default:
       return state;
   }
 }
 
-function showAddCard(state = initialState) {
+function showAddCard(state = false, action) {
   switch (action.type) {
     case TOGGLE_ADD_CARD:
-      return Object.assign({}, state, {
-        showAddCard: !state.showAddCard
-      });
+      return !state.showAddCard;
+
     default:
       return state;
   }
 }
-function showStudy(state = initialState) {
+function showStudy(state = false, action) {
   switch (action.type) {
-    case TOGGLE_ADD_DECK:
-      return Object.assign({}, state, {
-        showStudy: !state.showStudy
-      });
+    case TOGGLE_STUDY:
+      return !state.showStudy;
+
     default:
       return state;
   }
 }
 
-function showBack(state = initialState) {
+function showBack(state = false, action) {
   switch (action.type) {
     case TOGGLE_CARD_VIEW:
-      return Object.assign({}, state, {
-        showBack: !state.showBack
-      });
+      return !state.showBack;
+
+    default:
+      return state;
+  }
+}
+function currentCard(state = 0, action) {
+  switch (action.type) {
+    case SET_CURRENT_CARD:
+      return action.index;
+
+    default:
+      return state;
+  }
+}
+function currentDeck(state = 0, action) {
+  switch (action.type) {
+    case SET_CURRENT_DECK:
+      return action.index;
+
     default:
       return state;
   }
@@ -161,12 +192,13 @@ function showBack(state = initialState) {
 
 const flashCardApp = combineReducers({
   showAddDeck,
-  showEditDeck,
   showEditCard,
   showAddCard,
   showStudy,
   showBack,
-  decks
+  decks,
+  currentCard,
+  currentDeck
 });
 
 export default flashCardApp;
