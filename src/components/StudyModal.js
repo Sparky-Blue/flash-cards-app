@@ -1,11 +1,12 @@
 import React, { Component } from "react";
-import Card from "./Card";
+import CurrentCard from "../containers/CurrentCard";
+import { toggleCardView } from "../actions";
 
 class StudyModal extends Component {
   render() {
     return (
       <div className="studyModal">
-        <Card />
+        <CurrentCard />
       </div>
     );
   }

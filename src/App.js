@@ -6,6 +6,10 @@ import CreateDeck from "./components/CreateDeck";
 import StudyModal from "./components/StudyModal";
 import { decks } from "./decks.js";
 
+import { createStore } from "redux";
+import flashCardApp from "./reducers";
+import { addDeck, addCard, toggleAddCard } from "./actions";
+
 class App extends Component {
   render() {
     return (
